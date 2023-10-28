@@ -82,6 +82,10 @@ func (e *Engine) Update() {
 	if rl.IsKeyPressed(rl.KeyO) {
 		e.camera.Offset.X -= 10
 	}
+	if rl.IsMouseButtonDown(rl.MouseMiddleButton) {
+		e.camera.Offset.X += rl.GetMouseDelta().X
+		e.camera.Offset.Y += rl.GetMouseDelta().Y
+	}
 	// mousePos := rl.GetMousePosition()
 	// if mousePos.X > float32(e.WinWidth-20) && mousePos.X < float32(e.WinWidth) {
 	// 	e.camera.Offset.X += 10
