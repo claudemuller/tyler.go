@@ -5,7 +5,7 @@ import (
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
-	g "github.com/claudemuller/tyler.go/internal/pkg/gui"
+	"github.com/claudemuller/tyler.go/internal/pkg/ui"
 )
 
 type Engine struct {
@@ -18,7 +18,7 @@ type Engine struct {
 	rows      int
 	pause     bool
 	tilemap   []int
-	gui       *g.Gui
+	gui       *ui.Ui
 }
 
 func New(winWidth, winHeight int32) (Engine, error) {
@@ -26,11 +26,11 @@ func New(winWidth, winHeight int32) (Engine, error) {
 
 	rl.SetTargetFPS(60)
 
-	gui, err := g.New()
+	gui, err := ui.New()
 	if err != nil {
 		return Engine{}, fmt.Errorf("error creating gui: %v", err)
 	}
-	// gui.AddDebugText("mousepos", "")
+	gui.AddDebugText("mousepos", "")
 
 	e := Engine{
 		WinWidth:  int32(winWidth),
@@ -100,7 +100,7 @@ func (e *Engine) handleMouseEvents() {
 
 func (e *Engine) Render() {
 	rl.BeginDrawing()
-	rl.ClearBackground(rl.RayWhite)
+	rl.ClearBackground(rl.DarkGray)
 
 	rl.BeginMode2D(e.camera)
 
@@ -111,7 +111,7 @@ func (e *Engine) Render() {
 			rl.DrawRectangle(x, y, int32(e.tileSize), int32(e.tileSize), rl.Black)
 			continue
 		}
-		rl.DrawRectangleLines(x, y, int32(e.tileSize), int32(e.tileSize), rl.LightGray)
+		rl.DrawRectangleLines(x, y, int32(e.tileSize), int32(e.tileSize), rl.Black)
 	}
 
 	rl.EndMode2D()
@@ -123,6 +123,7 @@ func (e *Engine) Render() {
 
 func (e *Engine) getMouseOverCell() int {
 	e.gui.UpdateDebugText("mousepos", fmt.Sprintf("x:%d y:%d", rl.GetMouseX(), rl.GetMouseY()))
+
 	x := float32(rl.GetMouseX()-int32(e.camera.Offset.X)) / (e.tileSize * e.camera.Zoom)
 	y := float32(rl.GetMouseY()-int32(e.camera.Offset.Y)) / (e.tileSize * e.camera.Zoom)
 	return int(y)*e.cols + int(x)
