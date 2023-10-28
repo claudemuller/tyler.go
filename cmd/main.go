@@ -1,16 +1,18 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/claudemuller/tyler.go/internal/pkg/engine"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
-	game := engine.New(1024, 768)
-
-	rl.InitWindow(game.WinWidth, game.WinHeight, "Tyler")
-
-	rl.SetTargetFPS(60)
+	game, err := engine.New(1024, 768)
+	if err != nil {
+		fmt.Printf("error starting engine: %v", err)
+		return
+	}
 
 	for game.IsRunning && !rl.WindowShouldClose() {
 		game.Update()
