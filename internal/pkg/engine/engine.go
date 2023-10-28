@@ -18,7 +18,7 @@ type Engine struct {
 	rows      int
 	pause     bool
 	tilemap   []int
-	gui       *ui.Ui
+	gui       *ui.UI
 }
 
 func New(winWidth, winHeight int32) (Engine, error) {
@@ -58,23 +58,17 @@ func New(winWidth, winHeight int32) (Engine, error) {
 	return e, nil
 }
 
-func (e *Engine) Update() {
-	if rl.IsKeyPressed(rl.KeySpace) {
-		e.pause = !e.pause
-	}
+func (e *Engine) ProcessInput() {
+	// ------------------------------------------------------------------------
+	// UI Input
 
-	if rl.IsKeyPressed(rl.KeyQ) {
-		e.IsRunning = false
-	}
-
-	e.handleMouseEvents()
-}
-
-func (e *Engine) handleMouseEvents() {
-	if rl.CheckCollisionPointRec(rl.GetMousePosition(), e.gui.Pos) {
-		e.gui.Update()
+	e.gui.ProcessInput()
+	if e.gui.IsActive {
 		return
 	}
+
+	// ------------------------------------------------------------------------
+	// Mouse
 
 	if rl.IsMouseButtonDown(rl.MouseLeftButton) {
 		e.tilemap[e.getMouseOverCell()] = 1
@@ -96,11 +90,26 @@ func (e *Engine) handleMouseEvents() {
 		e.camera.Offset.X += rl.GetMouseDelta().X
 		e.camera.Offset.Y += rl.GetMouseDelta().Y
 	}
+
+	// ------------------------------------------------------------------------
+	// Keyboard
+
+	if rl.IsKeyPressed(rl.KeySpace) {
+		e.pause = !e.pause
+	}
+
+	if rl.IsKeyPressed(rl.KeyQ) {
+		e.IsRunning = false
+	}
+}
+
+func (e *Engine) Update() {
+	e.gui.Update()
 }
 
 func (e *Engine) Render() {
 	rl.BeginDrawing()
-	rl.ClearBackground(rl.DarkGray)
+	rl.ClearBackground(rl.White)
 
 	rl.BeginMode2D(e.camera)
 
@@ -111,7 +120,7 @@ func (e *Engine) Render() {
 			rl.DrawRectangle(x, y, int32(e.tileSize), int32(e.tileSize), rl.Black)
 			continue
 		}
-		rl.DrawRectangleLines(x, y, int32(e.tileSize), int32(e.tileSize), rl.Black)
+		rl.DrawRectangleLines(x, y, int32(e.tileSize), int32(e.tileSize), rl.LightGray)
 	}
 
 	rl.EndMode2D()
@@ -122,7 +131,7 @@ func (e *Engine) Render() {
 }
 
 func (e *Engine) getMouseOverCell() int {
-	e.gui.UpdateDebugText("mousepos", fmt.Sprintf("x:%d y:%d", rl.GetMouseX(), rl.GetMouseY()))
+	// e.gui.UpdateDebugText("mousepos", fmt.Sprintf("x:%d y:%d", rl.GetMouseX(), rl.GetMouseY()))
 
 	x := float32(rl.GetMouseX()-int32(e.camera.Offset.X)) / (e.tileSize * e.camera.Zoom)
 	y := float32(rl.GetMouseY()-int32(e.camera.Offset.Y)) / (e.tileSize * e.camera.Zoom)
