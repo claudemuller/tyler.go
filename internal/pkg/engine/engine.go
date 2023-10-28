@@ -18,7 +18,7 @@ type Engine struct {
 	rows      int
 	pause     bool
 	tilemap   []int
-	gui       *ui.UI
+	ui        *ui.UI
 }
 
 func New(winWidth, winHeight int32) (Engine, error) {
@@ -30,7 +30,6 @@ func New(winWidth, winHeight int32) (Engine, error) {
 	if err != nil {
 		return Engine{}, fmt.Errorf("error creating gui: %v", err)
 	}
-	gui.AddDebugText("mousepos", "")
 
 	e := Engine{
 		WinWidth:  int32(winWidth),
@@ -52,7 +51,7 @@ func New(winWidth, winHeight int32) (Engine, error) {
 		cols:     50,
 		rows:     50,
 		tilemap:  make([]int, 50*50),
-		gui:      gui,
+		ui:       gui,
 	}
 
 	return e, nil
@@ -62,8 +61,8 @@ func (e *Engine) ProcessInput() {
 	// ------------------------------------------------------------------------
 	// UI Input
 
-	e.gui.ProcessInput()
-	if e.gui.IsActive {
+	e.ui.ProcessInput()
+	if e.ui.InputLocked {
 		return
 	}
 
@@ -104,7 +103,7 @@ func (e *Engine) ProcessInput() {
 }
 
 func (e *Engine) Update() {
-	e.gui.Update()
+	e.ui.Update()
 }
 
 func (e *Engine) Render() {
@@ -125,7 +124,7 @@ func (e *Engine) Render() {
 
 	rl.EndMode2D()
 
-	e.gui.Render()
+	e.ui.Render()
 
 	rl.EndDrawing()
 }
